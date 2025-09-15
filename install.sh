@@ -3,7 +3,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # CCAL (Claude Code Arch Linux) Installer
-# Usage: curl -sSL https://raw.githubusercontent.com/nicholascsmith/claude-code-arch-config/main/install.sh | bash
+# Usage: curl -sSL https://raw.githubusercontent.com/nicholascsmith/CCAL/main/install.sh | bash
 
 INSTALL_DIR="/opt/ccal"
 REQUIRED_PACKAGES=(git docker github-cli)
@@ -18,6 +18,10 @@ else
     ui_error() { echo "❌ $*" >&2; }
     ui_info() { echo "ℹ️  $*"; }
     ui_step() { echo "🔧 $*"; }
+    ui_warning() { echo "! $*"; }
+    ui_docker() { echo "• $*"; }
+    ui_lock() { echo "• $*"; }
+    ui_rocket() { echo "> $*"; }
     ui_log() { echo "[$(date +'%H:%M:%S')] $*" >&2; }
     ui_banner_install() { 
         cat << 'EOF'
@@ -94,7 +98,7 @@ install_dependencies() {
 
 # Get repository URL
 get_repo_url() {
-    echo "https://github.com/nicholascsmith/claude-code-arch-config"
+    echo "https://github.com/nicholascsmith/CCAL"
 }
 
 # Download and install
@@ -194,6 +198,13 @@ update_path() {
     ui_success "Added to PATH in $shell_config"
 }
 
+# Export PATH for current session
+export_current_path() {
+    ui_step "Creating custom command"
+    export PATH="/opt/ccal:$PATH"
+    ui_success "vibe command is now available"
+}
+
 main() {
     echo
     ui_banner_install
@@ -204,6 +215,7 @@ main() {
     install_files "$(get_repo_url)"
     create_vibe_command
     update_path
+    export_current_path
     
     echo
     ui_complete

@@ -9,7 +9,8 @@
 ## Quick Start
 
 ```bash
-curl -sSL https://github.com/nicholascsmith/CCAL/releases/latest/download/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/nicholascsmith/CCAL/main/install.sh | bash
+source ~/.bashrc  # or restart your terminal
 vibe new
 ```
 
@@ -26,7 +27,8 @@ vibe new
 
 ### 1. Install Dependencies
 ```bash
-curl -sSL https://github.com/nicholascsmith/CCAL/releases/latest/download/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/nicholascsmith/CCAL/main/install.sh | bash
+source ~/.bashrc  # or restart your terminal
 ```
 
 ### 2. Create New Project
