@@ -9,7 +9,7 @@
 ## Quick Start
 
 ```bash
-curl -sSL https://github.com/nicholascsmith/ccal/releases/latest/download/install.sh | bash
+curl -sSL https://github.com/nicholascsmith/CCAL/releases/latest/download/install.sh | bash
 vibe new
 ```
 
@@ -26,7 +26,7 @@ vibe new
 
 ### 1. Install Dependencies
 ```bash
-curl -sSL https://github.com/nicholascsmith/claude-code-arch-config/releases/latest/download/install.sh | bash
+curl -sSL https://github.com/nicholascsmith/CCAL/releases/latest/download/install.sh | bash
 ```
 
 ### 2. Create New Project
