@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create release archive
+        run: |
+          mkdir -p dist
+          tar -czf dist/claude-code-setup-${{ steps.version.outputs.version }}.tar.gz \
+            src/ install.sh LICENSE README.md VERSION
+
+      - name: Generate checksums
+        run: |
+          cd dist
+          sha256sum *.tar.gz > checksums.sha256
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          # Generate simple release notes
+          echo "Release v${{ steps.version.outputs.version }}" > release_notes.md
+          echo "" >> release_notes.md
+          echo "## What's Included" >> release_notes.md
+          echo "- Latest CCAL scripts and templates" >> release_notes.md
+          echo "- Docker configuration for Claude Code" >> release_notes.md
+          echo "- Installation and setup utilities" >> release_notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release v${{ steps.version.outputs.version }}
+          body_path: release_notes.md
+          files: |
+            dist/claude-code-setup-${{ steps.version.outputs.version }}.tar.gz
+            dist/checksums.sha256
+          draft: false
+          prerelease: false
+
+  update-installer:
+    name: Update Installer
+    needs: create-release
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update version in installer
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          sed -i "s/VERSION=\"\${CLAUDE_SETUP_VERSION:-latest}\"/VERSION=\"\${CLAUDE_SETUP_VERSION:-$VERSION}\"/" install.sh
+
+      - name: Commit version update
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add install.sh
+          git commit -m "Update installer default version to ${GITHUB_REF#refs/tags/v}" || exit 0
+          git push

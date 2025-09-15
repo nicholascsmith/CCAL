@@ -1,0 +1,39 @@
+# Build artifacts
+*.tar.gz
+*.zip
+dist/
+build/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# IDE/Editor
+.vscode/
+.idea/
+*.sublime-*
+
+# OS
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Test artifacts
+test-output/
+coverage/
+
+# Local development
+.env.local
+local/
+scratch/
+
+# Downloaded files (managed elsewhere)
+CLAUDE.md

@@ -1,0 +1,90 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  shellcheck:
+    name: Shell Script Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './src'
+          severity: error
+          ignore_paths: |
+            .git
+            .github
+
+  syntax-check:
+    name: Bash Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check bash syntax
+        run: |
+          find src -name "*.sh" -type f -exec bash -n {} \;
+          bash -n install.sh
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Bandit Security Scan
+        run: |
+          # Check for common security issues in shell scripts
+          grep -r "curl.*|.*bash" . && exit 1 || true
+          grep -r "wget.*|.*sh" . && exit 1 || true
+          grep -r "echo.*password\|echo.*token" src/ && exit 1 || true
+          echo "Security scan passed"
+
+  docker-test:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test Docker build
+        run: |
+          cd src/templates
+          docker build -t test-claude-code .
+          docker run --rm test-claude-code claude --version
+
+  integration-test:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test installer syntax
+        run: |
+          # Test installer script syntax
+          bash -n install.sh
+          
+      - name: Validate templates
+        run: |
+          # Ensure all required template files exist
+          test -f src/templates/Dockerfile
+          test -f src/templates/docker-compose.yml
+          test -f src/templates/.gitignore
+          
+      - name: Check script permissions
+        run: |
+          # Verify scripts are executable
+          test -x src/setup.sh
+          test -x src/claude.sh
+          test -x install.sh

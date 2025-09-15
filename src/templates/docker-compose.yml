@@ -1,0 +1,41 @@
+services:
+  claude-code:
+    build: .
+    image: claude-code:latest
+    container_name: claude-code
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    init: true
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
+    
+    # Resource limits - prevent system instability
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+          cpus: '2'
+        reservations:
+          memory: 256m
+          cpus: '0.25'
+    
+    # Volume mounts
+    volumes:
+      - ./:/workspace
+      - claude-auth:/home/node/.claude
+    
+    # Security
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+
+# Persistent volumes
+volumes:
+  claude-auth:
+    driver: local
