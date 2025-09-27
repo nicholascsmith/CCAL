@@ -10,8 +10,7 @@
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/nicholascsmith/CCAL/main/install.sh | bash
-source ~/.bashrc  # or restart your terminal
-vibe new
+/opt/ccal/src/setup.sh
 ```
 
 ## What You Get
